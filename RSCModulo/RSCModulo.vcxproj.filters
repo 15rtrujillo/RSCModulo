@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Client.cpp">
+    <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Networking\ISAAC.cpp">
@@ -24,12 +24,18 @@
     <ClCompile Include="src\Networking\Networking.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Utils\RLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Networking\ISAAC.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Networking\Networking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\RLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
