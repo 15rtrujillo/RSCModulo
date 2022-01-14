@@ -143,12 +143,14 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Networking\ISAAC.cpp" />
     <ClCompile Include="src\Networking\Networking.cpp" />
+    <ClCompile Include="src\Networking\Packet.cpp" />
     <ClCompile Include="src\Utils\LogManager.cpp" />
     <ClCompile Include="src\Utils\RLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Networking\Networking.h" />
     <ClInclude Include="src\Networking\ISAAC.h" />
+    <ClInclude Include="src\Networking\Packet.h" />
     <ClInclude Include="src\Utils\LogManager.h" />
     <ClInclude Include="src\Utils\RLogger.h" />
   </ItemGroup>
