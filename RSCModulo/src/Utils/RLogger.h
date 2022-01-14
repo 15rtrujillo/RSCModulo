@@ -7,14 +7,14 @@
 /// Used to log important messages out to a log file
 class RLogger
 {
+	friend class LogManager;
+
 private:
 	std::ofstream logfile;
-
-protected:
-
-public:
 	RLogger();
 	~RLogger();
+
+public:
 
 	void info(std::string message);
 
