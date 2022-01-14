@@ -16,18 +16,29 @@ typedef int SOCKET
 #ifndef NETWORKING_H
 #define NETWORKING_H
 
+/// <summary>
 /// Provides functions for cross-platform networking
+/// </summary>
 class Networking
 {
 public:
+	/// <summary>
 	/// Initialize Winsock (only needed for Windows)
-	/// Returns non-zero if failure
+	/// </summary>
+	/// <returns>Non-zero if failure</returns>
 	static int socketInit();
 
+	/// <summary>
 	/// Clean up Winsock (only needed for Windows)
+	/// </summary>
+	/// <returns>Non-zero if failure</returns>
 	static int socketCleanup();
 
-	/// Cross-platform socket close
+	/// <summary>
+	/// Cross platform socket close
+	/// </summary>
+	/// <param name="sock">The socket to close (on POSIX this is just an int)</param>
+	/// <returns>Non-zero if failure</returns>
 	static int socketClose(SOCKET sock);
 };
 
