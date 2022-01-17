@@ -23,12 +23,17 @@ Packet::~Packet()
 	delete[] payload;
 }
 
-int Packet::getOpcode()
+int Packet::getOpcode() const
 {
 	return opcode;
 }
 
-char* Packet::getPayload()
+long Packet::getPacketNumber() const
+{
+	return packetNumber;
+}
+
+char* Packet::getPayload() const
 {
 	char* newPayload = new char[payloadLength];
 	for (int i = 0; i < payloadLength; ++i)
@@ -39,7 +44,7 @@ char* Packet::getPayload()
 	return newPayload;
 }
 
-int Packet::getLength()
+int Packet::getLength() const
 {
 	return payloadLength;
 }
@@ -102,12 +107,9 @@ long Packet::readLong()
 std::string Packet::readLineFeedString()
 {
 	std::stringstream ss;
-	for (int i = readIndex; i < payloadLength; ++i)
+	for (; readIndex < payloadLength; ++readIndex)
 	{
-		// We want to do this every time.
-		++readIndex;
-
-		char c = payload[i];
+		char c = payload[readIndex];
 		if (c == 10)
 			break;
 		ss << c;
@@ -118,5 +120,22 @@ std::string Packet::readLineFeedString()
 
 std::string Packet::readZeroPaddedString()
 {
-	return std::string();
+	std::stringstream ss;
+
+	// If the readIndex doesn't have a zero, then we don't have a zero-padded string.
+	if (payload[readIndex] != 0) return "";
+
+	// If the current read index is a zero, we'll go ahead and move it forward
+	// because we don't want to actually include the zero in the string.
+	++readIndex;
+
+	for (; readIndex < payloadLength; ++readIndex)
+	{
+		char c = payload[readIndex];
+		if (c == 0)
+			break;
+		ss << c;
+	}
+
+	return ss.str();
 }

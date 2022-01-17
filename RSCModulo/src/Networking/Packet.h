@@ -15,28 +15,30 @@ private:
 	int payloadLength;
 	int readIndex = 0;
 
+	static long nextPacketNumber;
 	static long getNextPacketNumber();
 
 public:
-	static long nextPacketNumber;
 	
 	Packet(int opcode, char* payload, int payloadLength);
 
 	~Packet();
 
-	int getOpcode();
+	int getOpcode() const;
+
+	long getPacketNumber() const;
 
 	/// <summary>
 	/// Get the entire payload buffer
 	/// </summary>
 	/// <returns>A COPY of the payload buffer</returns>
-	char* getPayload();
+	char* getPayload() const;
 
 	/// <summary>
 	/// Get the length of the packet's payload
 	/// </summary>
 	/// <returns>The length of the payload</returns>
-	int getLength();
+	int getLength() const;
 
 	char readByte();
 
