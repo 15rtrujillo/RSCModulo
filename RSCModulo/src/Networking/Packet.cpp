@@ -10,7 +10,7 @@ long Packet::getNextPacketNumber()
 	return nextPacketNumber++;
 }
 
-Packet::Packet(int opcode, char* payload, int payloadLength)
+Packet::Packet(char opcode, char* payload, int payloadLength)
 {
 	this->opcode = opcode;
 	this->payload = payload;
@@ -23,7 +23,7 @@ Packet::~Packet()
 	delete[] payload;
 }
 
-int Packet::getOpcode() const
+char Packet::getOpcode() const
 {
 	return opcode;
 }

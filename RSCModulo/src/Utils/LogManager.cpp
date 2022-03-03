@@ -14,5 +14,6 @@ RLogger* LogManager::getLogger()
 	{
 		logger = new RLogger;
 	}
+
 	return logger;
 }

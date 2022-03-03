@@ -9,7 +9,7 @@
 class Packet
 {
 private:
-	int opcode;
+	char opcode;
 	long packetNumber;
 	char* payload;
 	int payloadLength;
@@ -20,11 +20,11 @@ private:
 
 public:
 	
-	Packet(int opcode, char* payload, int payloadLength);
+	Packet(char opcode, char* payload, int payloadLength);
 
 	~Packet();
 
-	int getOpcode() const;
+	char getOpcode() const;
 
 	long getPacketNumber() const;
 
