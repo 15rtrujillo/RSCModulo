@@ -1,7 +1,7 @@
 #include <iostream>
 #include <ctime>
 
-#include "RLogger.h"
+#include "Logger.h"
 
 // Helper functions
 std::tm localtime_xp(std::time_t timer)
@@ -22,27 +22,33 @@ std::string time_stamp(const std::string& fmt = "%F %T")
 	return { buf, std::strftime(buf, sizeof(buf), fmt.c_str(), &bt) };
 }
 
-RLogger::RLogger()
+Logger::Logger()
 {
 	logfile.open("modulo.log", std::ios::out | std::ios::app);
 }
 
-RLogger::~RLogger()
+Logger::~Logger()
 {
 	logfile.close();
 }
 
-void RLogger::info(std::string message)
+Logger& Logger::getLogger()
+{
+	static Logger logger;
+	return logger;
+}
+
+void Logger::info(std::string message)
 {
 	logfile << "[" << time_stamp() << "] [Info] " << message << std::endl;
 }
 
-void RLogger::warn(std::string message)
+void Logger::warn(std::string message)
 {
 	logfile << "[" << time_stamp() << "] [Warn] " << message << std::endl;
 }
 
-void RLogger::error(std::string message)
+void Logger::error(std::string message)
 {
 	logfile << "[" << time_stamp() << "] [Error] " << message << std::endl;
 }

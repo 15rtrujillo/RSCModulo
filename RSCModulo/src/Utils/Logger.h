@@ -1,22 +1,27 @@
 #include <fstream>
 #include <string>
 
-#ifndef RLOGGER_H
-#define RLOGGER_H
+#ifndef LOGGER_H
+#define LOGGER_H
 
 /// <summary>
 /// Used to log important messages out to a log file
 /// </summary>
-class RLogger
+class Logger
 {
-	friend class LogManager;
-
 private:
 	std::ofstream logfile;
-	RLogger();
-	~RLogger();
+	Logger();
+	~Logger();
+	Logger(const Logger&) = delete;
+	Logger& operator=(const Logger&) = delete;
 
 public:
+	/// <summary>
+	/// Get the singleton instance of the Logger class
+	/// </summary>
+	/// <returns>The logger object</returns>
+	static Logger& getLogger();
 
 	/// <summary>
 	/// Log message to file with an info tag

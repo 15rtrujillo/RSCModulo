@@ -4,7 +4,7 @@ This is my attempt at writing a RuneScape Classic shell client that uses the mud
 
 If you're wondering about the name, I picked it to play off the RSC[math operator] naming scheme that a couple other RSC-related projects use. Basically, RSC% is the "remainder" of RSC that you get when you "divide" out the graphics.
 
-I plan on mostly working on this project on my own. Eventually I'll add a open source license once I figure out which one is a good fit for this project so that others can contribute if they want.
+I plan on mostly working on this project on my own. Eventually I'll add a open source license once I figure out which one is a good fit for this project so that others can contribute if they want. I also don't plan on using any pre-made libraries (e.g. Boost) because I never learned how to link things and I don't want to learn now.
 
 This project is for educational purposes. I don't own RuneScape, nor am I affiliated with Jagex in any way.
 

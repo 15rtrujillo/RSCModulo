@@ -1,9 +1,8 @@
-#include "Utils/RLogger.h"
-#include "Utils/LogManager.h"
+#include "Utils/Logger.h"
 
 int main(int argc, char* argv[])
 {	
-	RLogger* logger = LogManager::getLogger();
-	logger->info("Hello, world!");
+	Logger& logger = Logger::getLogger();
+	logger.info("Hello, world!");
 	return 0;
 }

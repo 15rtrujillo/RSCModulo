@@ -80,6 +80,5 @@ Packet PacketBuilder::toPacket()
 void PacketBuilder::writeByte(char byte)
 {
 	checkAndResize(sizeof(byte));
-	payload[writePosition] = byte;
-	++writePosition;
+	payload[writePosition++] = byte;
 }
