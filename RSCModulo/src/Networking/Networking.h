@@ -1,9 +1,10 @@
 #ifdef _WIN32
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0501  /* Windows XP. */
+#define _WIN32_WINNT 0x0600  /* Windows Vista */
 #endif
 #include <winsock2.h>
 #include <Ws2tcpip.h>
+#pragma comment(lib, "Ws2_32.lib")
 #else
 /* Assume that any non-Windows platform uses POSIX-style sockets instead. */
 #include <sys/socket.h>
@@ -40,6 +41,12 @@ public:
 	/// <param name="sock">The socket to close (on POSIX this is just an int)</param>
 	/// <returns>Non-zero if failure</returns>
 	static int socketClose(SOCKET sock);
+
+private:
+	/// <summary>
+	/// The socket for the connection to the server
+	/// </summary>
+	SOCKET socket;
 };
 
 #endif

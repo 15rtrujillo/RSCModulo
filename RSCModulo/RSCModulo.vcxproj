@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Utils\ConfigFile.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Networking\ISAAC.cpp" />
     <ClCompile Include="src\Networking\Networking.cpp" />
@@ -148,6 +149,7 @@
     <ClCompile Include="src\Utils\Logger.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Utils\ConfigFile.h" />
     <ClInclude Include="src\Networking\Networking.h" />
     <ClInclude Include="src\Networking\ISAAC.h" />
     <ClInclude Include="src\Networking\Packet.h" />
