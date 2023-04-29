@@ -1,37 +1,31 @@
 #include "Networking.h"
 
-int Networking::socketInit()
+using namespace boost::asio;
+using namespace boost::asio::ip;
+
+int Networking::initializeConnection(const char* serverAddress, const char* port)
 {
-#ifdef _WIN32
-    WSADATA wsa_data;
-    return WSAStartup(MAKEWORD(2, 0), &wsa_data);
-#else
-    return 0;
-#endif
+    io_context io_context;
+
+    // Create a TCP resolver and query the server endpoint
+    tcp::resolver resolver(io_context);
+    tcp::resolver::query query(serverAddress, port);
+
+    // Resolve the endpoint iterator and create a socket
+    tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+    tcp::socket socket(io_context);
+
+    return connectToServer(socket, endpoint_iterator);
 }
 
-int Networking::socketCleanup()
+int Networking::connectToServer(tcp::socket& socket, tcp::resolver::iterator endpoint_iterator)
 {
-#ifdef _WIN32
-    return WSACleanup();
-#else
+    // Connect the socket to the server
+    boost::system::error_code error;
+    connect(socket, endpoint_iterator, error);
+    if (error)
+    {
+        return 1;
+    }
     return 0;
-#endif
-}
-
-int Networking::socketClose(SOCKET sock)
-{
-
-    int status = 0;
-
-#ifdef _WIN32
-    status = shutdown(sock, SD_BOTH);
-    if (status == 0) { status = closesocket(sock); }
-#else
-    status = shutdown(sock, SHUT_RDWR);
-    if (status == 0) { status = close(sock); }
-#endif
-
-    return status;
-
 }

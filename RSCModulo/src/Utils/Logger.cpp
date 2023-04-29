@@ -1,35 +1,36 @@
-#include <iostream>
-#include <ctime>
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/sinks/text_file_backend.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/utility/setup/file.hpp>
+#include <boost/log/support/date_time.hpp>
+#include <boost/thread/thread.hpp>
 
 #include "Logger.h"
 
-// Helper functions
-std::tm localtime_xp(std::time_t timer)
-{
-	std::tm bt{};
-#ifdef _WIN32
-	localtime_s(&bt, &timer);
-#else 
-	localtime_r(&timer, &bt);
-#endif
-	return bt;
-}
-
-std::string time_stamp(const std::string& fmt = "%F %T")
-{
-	std::tm bt = localtime_xp(std::time(0));
-	char buf[64];
-	return { buf, std::strftime(buf, sizeof(buf), fmt.c_str(), &bt) };
-}
+namespace logging = boost::log;
+namespace expr = boost::log::expressions;
+namespace keywords = boost::log::keywords;
+namespace trivial = boost::log::trivial;
 
 Logger::Logger()
 {
-	logfile.open("modulo.log", std::ios::out | std::ios::app);
-}
+    logging::add_file_log
+    (
+        keywords::file_name = "modulo.log",
+        keywords::format =
+        (
+            expr::stream <<
+            "[" << expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S") <<
+            "] [" << trivial::severity <<
+            "] " << expr::message
+        )
+    );
 
-Logger::~Logger()
-{
-	logfile.close();
+    logging::add_common_attributes();
+
+    logging::core::get()->set_filter(trivial::severity >= trivial::info);
 }
 
 Logger& Logger::getLogger()
@@ -38,17 +39,22 @@ Logger& Logger::getLogger()
 	return logger;
 }
 
-void Logger::info(std::string message)
+void Logger::info(const std::string &message) const
 {
-	logfile << "[" << time_stamp() << "] [Info] " << message << std::endl;
+    BOOST_LOG_TRIVIAL(info) << message;
 }
 
-void Logger::warn(std::string message)
+void Logger::warning(const std::string &message) const
 {
-	logfile << "[" << time_stamp() << "] [Warn] " << message << std::endl;
+    BOOST_LOG_TRIVIAL(warning) << message;
 }
 
-void Logger::error(std::string message)
+void Logger::error(const std::string &message) const
 {
-	logfile << "[" << time_stamp() << "] [Error] " << message << std::endl;
+    BOOST_LOG_TRIVIAL(error) << message;
+}
+
+void Logger::fatal(const std::string& message) const
+{
+    BOOST_LOG_TRIVIAL(fatal) << message;
 }

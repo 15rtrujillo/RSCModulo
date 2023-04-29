@@ -1,4 +1,3 @@
-#include <memory>
 #include "PacketBuilder.h"
 
 // Initialize static members

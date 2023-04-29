@@ -10,7 +10,7 @@
 class ConfigFile
 {
 public:
-	ConfigFile();
+	ConfigFile(const std::string &fileName);
 
 	/// <summary>
 	/// Get the count of settings that have been read from the config file
@@ -23,7 +23,7 @@ public:
 	/// </summary>
 	/// <param name="setting">The setting to retrieve</param>
 	/// <returns>The specified setting's value</returns>
-	std::string getSetting(std::string setting) const;
+	std::string getSetting(const std::string &setting) const;
 
 private:
 	std::map<std::string, std::string> configs;

@@ -20,29 +20,28 @@ public:
 	/// Log message to file with an info tag
 	/// </summary>
 	/// <param name="message">The message to log</param>
-	void info(std::string message);
+	void info(const std::string &message) const;
 
 	/// <summary>
 	/// Log message to file with a warning tag
 	/// </summary>
 	/// <param name="message">The message to log</param>
-	void warn(std::string message);
+	void warning(const std::string &message) const;
 
 	/// <summary>
 	/// Log message to file with an error tag
 	/// </summary>
 	/// <param name="message">The message to log</param>
-	void error(std::string message);
+	void error(const std::string &message) const;
+
+	/// <summary>
+	/// Log message to file with an fatal tag
+	/// </summary>
+	/// <param name="message">The message to log</param>
+	void fatal(const std::string& message) const;
 
 private:
-	/// <summary>
-	/// The filestream for the log file
-	/// </summary>
-	std::ofstream logfile;
-
 	Logger();
-
-	~Logger();
 
 	Logger(const Logger&) = delete;
 
