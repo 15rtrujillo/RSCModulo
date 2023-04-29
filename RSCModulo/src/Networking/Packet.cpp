@@ -10,17 +10,10 @@ long Packet::getNextPacketNumber()
 	return nextPacketNumber++;
 }
 
-Packet::Packet(char opcode, char* payload, int payloadLength)
+Packet::Packet(char opcode, std::shared_ptr<char[]> payload, int payloadLength) : 
+	opcode(opcode), payload(payload), payloadLength(payloadLength), packetNumber(getPacketNumber())
 {
-	this->opcode = opcode;
-	this->payload = payload;
-	this->payloadLength = payloadLength;
-	this->packetNumber = getNextPacketNumber();
-}
 
-Packet::~Packet()
-{
-	delete[] payload;
 }
 
 char Packet::getOpcode() const
@@ -33,15 +26,9 @@ long Packet::getPacketNumber() const
 	return packetNumber;
 }
 
-char* Packet::getPayload() const
+std::shared_ptr<char[]> Packet::getPayload() const
 {
-	char* newPayload = new char[payloadLength];
-	for (int i = 0; i < payloadLength; ++i)
-	{
-		newPayload[i] = payload[i];
-	}
-
-	return newPayload;
+	return payload;
 }
 
 int Packet::getLength() const
@@ -54,16 +41,11 @@ char Packet::readByte()
 	return payload[readIndex++];
 }
 
-char* Packet::readBytes(int length)
+std::unique_ptr<char[]> Packet::readBytes(int length)
 {
-	char* readBytes = new char[length];
-	for (int i = 0; i < length; ++i)
-	{
-		readBytes[i] = payload[readIndex + i];
-	}
-
+	std::unique_ptr<char[]> readBytes = std::make_unique<char[]>(length);
+	std::memcpy(readBytes.get(), payload.get() + readIndex, length);
 	readIndex += length;
-
 	return readBytes;
 }
 
@@ -75,7 +57,7 @@ unsigned char Packet::readUnsignedByte()
 short Packet::readShort()
 {
 	// Black magics
-	short readShort = *reinterpret_cast<short*>(&payload[readIndex]);
+	short readShort = *reinterpret_cast<short*>(payload.get() + readIndex);
 	readIndex += sizeof(short);
 	return readShort;
 }
@@ -83,7 +65,7 @@ short Packet::readShort()
 unsigned short Packet::readUnsignedShort()
 {
 	// Black magics
-	unsigned short readShort = (*reinterpret_cast<short*>(&payload[readIndex])) & 0xFF;
+	unsigned short readShort = (*reinterpret_cast<short*>(payload.get() + readIndex)) & 0xFF;
 	readIndex += sizeof(unsigned short);
 	return readShort;
 }
@@ -91,7 +73,7 @@ unsigned short Packet::readUnsignedShort()
 int Packet::readInt()
 {
 	// Black magics
-	int readInt = *reinterpret_cast<int*>(&payload[readIndex]);
+	int readInt = *reinterpret_cast<int*>(payload.get() + readIndex);
 	readIndex += sizeof(int);
 	return readInt;
 }
@@ -99,7 +81,7 @@ int Packet::readInt()
 long Packet::readLong()
 {
 	// Black magics
-	long readLong = *reinterpret_cast<long*>(&payload[readIndex]);
+	long readLong = *reinterpret_cast<long*>(payload.get() + readIndex);
 	readIndex += sizeof(long);
 	return readLong;
 }

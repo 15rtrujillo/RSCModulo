@@ -1,3 +1,4 @@
+#include <memory>
 #include <string>
 
 #ifndef PACKET_H
@@ -8,31 +9,32 @@
 /// </summary>
 class Packet
 {
-private:
-	char opcode;
-	long packetNumber;
-	char* payload;
-	int payloadLength;
-	int readIndex = 0;
-
-	static long nextPacketNumber;
-	static long getNextPacketNumber();
-
 public:
-	
-	Packet(char opcode, char* payload, int payloadLength);
+	/// <summary>
+	/// Create a new wrapper for char/byte array that gets read from/sent across network
+	/// </summary>
+	/// <param name="opcode">The packet's opcode</param>
+	/// <param name="payload">The packet's payload</param>
+	/// <param name="payloadLength">The length of the payload</param>
+	Packet(char opcode, std::shared_ptr<char[]> payload, int payloadLength);
 
-	~Packet();
-
-	char getOpcode() const;
-
+	/// <summary>
+	/// Get the packet number
+	/// </summary>
+	/// <returns>The packet number</returns>
 	long getPacketNumber() const;
+
+	/// <summary>
+	/// Get the packet opcode
+	/// </summary>
+	/// <returns>The packet opcode</returns>
+	char getOpcode() const;
 
 	/// <summary>
 	/// Get the entire payload buffer
 	/// </summary>
-	/// <returns>A COPY of the payload buffer</returns>
-	char* getPayload() const;
+	/// <returns>A shared pointer to the payload buffer</returns>
+	std::shared_ptr<char[]> getPayload() const;
 
 	/// <summary>
 	/// Get the length of the packet's payload
@@ -40,23 +42,47 @@ public:
 	/// <returns>The length of the payload</returns>
 	int getLength() const;
 
+	/// <summary>
+	/// Read a single byte from the packet
+	/// </summary>
+	/// <returns>A byte from the packet</returns>
 	char readByte();
 
 	/// <summary>
 	/// Read a specific amount of bytes from the buffer
 	/// </summary>
 	/// <param name="length">The amount of bytes to read</param>
-	/// <returns>A NEW array of the read bytes</returns>
-	char* readBytes(int length);
+	/// <returns>A new array of the read bytes</returns>
+	std::unique_ptr<char[]> readBytes(int length);
 
+	/// <summary>
+	/// Read a single unsigned byte from the packet
+	/// </summary>
+	/// <returns>An unsigned byte from the packet</returns>
 	unsigned char readUnsignedByte();
 
+	/// <summary>
+	/// Read a short from the packet
+	/// </summary>
+	/// <returns>A short from the packet</returns>
 	short readShort();
 
+	/// <summary>
+	/// Read an unsigned short from the packet
+	/// </summary>
+	/// <returns>An unsigned short from the packet</returns>
 	unsigned short readUnsignedShort();
 
+	/// <summary>
+	/// Read an int from the packet
+	/// </summary>
+	/// <returns>An int from the packet</returns>
 	int readInt();
 
+	/// <summary>
+	/// Read a long from the packet
+	/// </summary>
+	/// <returns>A long from the packet</returns>
 	long readLong();
 
 	/// <summary>
@@ -71,6 +97,42 @@ public:
 	/// </summary>
 	/// <returns>The string without either padding zeros</returns>
 	std::string readZeroPaddedString();
-};
 
+private:
+	/// <summary>
+	/// An identifier for the packet
+	/// </summary>
+	long packetNumber;
+
+	/// <summary>
+	/// The packet's opcode
+	/// </summary>
+	char opcode;
+
+	/// <summary>
+	/// The data payload of the packet
+	/// </summary>
+	std::shared_ptr<char[]> payload;
+
+	/// <summary>
+	/// The length of the payload buffer
+	/// </summary>
+	int payloadLength;
+
+	/// <summary>
+	/// The current read index of the packet
+	/// </summary>
+	int readIndex = 0;
+
+	/// <summary>
+	/// Used for keeping track of the packet number
+	/// </summary>
+	static long nextPacketNumber;
+
+	/// <summary>
+	/// Get the next packet number
+	/// </summary>
+	/// <returns>The next packet number</returns>
+	static long getNextPacketNumber();
+};
 #endif

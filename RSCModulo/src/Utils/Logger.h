@@ -9,13 +9,6 @@
 /// </summary>
 class Logger
 {
-private:
-	std::ofstream logfile;
-	Logger();
-	~Logger();
-	Logger(const Logger&) = delete;
-	Logger& operator=(const Logger&) = delete;
-
 public:
 	/// <summary>
 	/// Get the singleton instance of the Logger class
@@ -40,6 +33,20 @@ public:
 	/// </summary>
 	/// <param name="message">The message to log</param>
 	void error(std::string message);
+
+private:
+	/// <summary>
+	/// The filestream for the log file
+	/// </summary>
+	std::ofstream logfile;
+
+	Logger();
+
+	~Logger();
+
+	Logger(const Logger&) = delete;
+
+	Logger& operator=(const Logger&) = delete;
 };
 
 #endif

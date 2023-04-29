@@ -1,174 +1,234 @@
 #include "ISAAC.h"
 
-ISAAC::ISAAC(int seed[], int seedSize)
+ISAAC::ISAAC() : count(0), a(0), b(0), c(0)
 {
-    for (int i = 0; i < seedSize; i++)
-        results[i] = seed[i];
+    for (int i = 0; i < size; ++i)
+    {
+        memory[i] = 0;
+        results[i] = 0;
+    }
+}
 
-    init();
+void ISAAC::setKeys(int seed[], int seedLen)
+{
+    for (int i = 0; i < seedLen; i++)
+    {
+        results[i] = seed[i];
+    }
+
+    initialize(true);
+}
+
+void ISAAC::reset()
+{
+    for (int i = 0; i < size; i++)
+    {
+        memory[i] = 0x00;
+        results[i] = 0x00;
+    }
+
+    a = b = c = 0;
 }
 
 int ISAAC::getNextValue()
 {
-    if (count-- == 0) {
+    if (count-- == 0)
+    {
         isaac();
-        count = 255;
+        count = size - 1;
     }
     return results[count];
 }
 
 void ISAAC::isaac()
 {
+    int i, j, x, y;
     b += ++c;
-    for (int i = 0; i < 256; i++) {
-        int x = memory[i];
-        switch (i & 3) {
-        case 0: // '\0'
-            a ^= a << 13;
-            break;
+    for (i = 0, j = size / 2; i < size / 2;)
+    {
+        x = memory[i];
+        a ^= a << 13;
+        a += memory[j++];
+        memory[i] = y = memory[(x & mask) >> 2] + a + b;
+        results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
 
-        case 1: // '\001'
-            a ^= (unsigned int)a >> 6;
-            break;
+        x = memory[i];
+        a ^= a >> 6;
+        a += memory[j++];
+        memory[i] = y = memory[(x & mask) >> 2] + a + b;
+        results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
 
-        case 2: // '\002'
-            a ^= a << 2;
-            break;
+        x = memory[i];
+        a ^= a << 2;
+        a += memory[j++];
+        memory[i] = y = memory[(x & mask) >> 2] + a + b;
+        results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
 
-        case 3: // '\003'
-            a ^= (unsigned int)a >> 16;
-            break;
-        }
-        a += memory[i + 128 & 0xff];
-        int k;
-        memory[i] = k = memory[(x & 0x3fc) >> 2] + a + b;
-        results[i] = b = memory[(k >> 8 & 0x3fc) >> 2] + x;
+        x = memory[i];
+        a ^= a >> 16;
+        a += memory[j++];
+        memory[i] = y = memory[(x & mask) >> 2] + a + b;
+        results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
+    }
+
+    for (j = 0; j < size / 2;)
+    {
+        x = memory[i];
+        a ^= a << 13;
+        a += memory[j++];
+        memory[i] = y = memory[(x & mask) >> 2] + a + b;
+        results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
+
+        x = memory[i];
+        a ^= a >> 6;
+        a += memory[j++];
+        memory[i] = y = memory[(x & mask) >> 2] + a + b;
+        results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
+
+        x = memory[i];
+        a ^= a << 2;
+        a += memory[j++];
+        memory[i] = y = memory[(x & mask) >> 2] + a + b;
+        results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
+
+        x = memory[i];
+        a ^= a >> 16;
+        a += memory[j++];
+        memory[i] = y = memory[(x & mask) >> 2] + a + b;
+        results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
     }
 }
 
-void ISAAC::init()
+void ISAAC::initialize(bool flag)
 {
-    int i1;
-    int j1;
-    int k1;
-    int l1;
-    int i2;
-    int j2;
-    int k2;
-    int l = i1 = j1 = k1 = l1 = i2 = j2 = k2 = 0x9e3779b9;
-    for (int i = 0; i < 4; i++) {
-        l ^= i1 << 11;
-        k1 += l;
-        i1 += j1;
-        i1 ^= (unsigned int)j1 >> 2;
-        l1 += i1;
-        j1 += k1;
-        j1 ^= k1 << 8;
-        i2 += j1;
-        k1 += l1;
-        k1 ^= (unsigned int)l1 >> 16;
-        j2 += k1;
-        l1 += i2;
-        l1 ^= i2 << 10;
-        k2 += l1;
-        i2 += j2;
-        i2 ^= (unsigned int)j2 >> 4;
-        l += i2;
-        j2 += k2;
-        j2 ^= k2 << 8;
-        i1 += j2;
-        k2 += l;
-        k2 ^= (unsigned int)l >> 9;
-        j1 += k2;
-        l += i1;
+    int i;
+    int a, b, c, d, e, f, g, h;
+
+    a = b = c = d = e = f = g = h = ratio;
+
+    for (i = 0; i < 4; ++i)
+    {
+        a ^= b << 11;
+        d += a;
+        b += c;
+        b ^= c >> 2;
+        e += b;
+        c += d;
+        c ^= d << 8;
+        f += c;
+        d += e;
+        d ^= e >> 16;
+        g += d;
+        e += f;
+        e ^= f << 10;
+        h += e;
+        f += g;
+        f ^= g >> 4;
+        a += f;
+        g += h;
+        g ^= h << 8;
+        b += g;
+        h += a;
+        h ^= a >> 9;
+        c += h;
+        a += b;
     }
 
-    for (int j = 0; j < 256; j += 8) {
-        l += results[j];
-        i1 += results[j + 1];
-        j1 += results[j + 2];
-        k1 += results[j + 3];
-        l1 += results[j + 4];
-        i2 += results[j + 5];
-        j2 += results[j + 6];
-        k2 += results[j + 7];
-        l ^= i1 << 11;
-        k1 += l;
-        i1 += j1;
-        i1 ^= (unsigned int)j1 >> 2;
-        l1 += i1;
-        j1 += k1;
-        j1 ^= k1 << 8;
-        i2 += j1;
-        k1 += l1;
-        k1 ^= (unsigned int)l1 >> 16;
-        j2 += k1;
-        l1 += i2;
-        l1 ^= i2 << 10;
-        k2 += l1;
-        i2 += j2;
-        i2 ^= (unsigned int)j2 >> 4;
-        l += i2;
-        j2 += k2;
-        j2 ^= k2 << 8;
-        i1 += j2;
-        k2 += l;
-        k2 ^= (unsigned int)l >> 9;
-        j1 += k2;
-        l += i1;
-        memory[j] = l;
-        memory[j + 1] = i1;
-        memory[j + 2] = j1;
-        memory[j + 3] = k1;
-        memory[j + 4] = l1;
-        memory[j + 5] = i2;
-        memory[j + 6] = j2;
-        memory[j + 7] = k2;
+    for (i = 0; i < size; i += 8)
+    {
+        if (flag)
+        {
+            a += results[i];
+            b += results[i + 1];
+            c += results[i + 2];
+            d += results[i + 3];
+            e += results[i + 4];
+            f += results[i + 5];
+            g += results[i + 6];
+            h += results[i + 7];
+        }
+
+        a ^= b << 11;
+        d += a;
+        b += c;
+        b ^= c >> 2;
+        e += b;
+        c += d;
+        c ^= d << 8;
+        f += c;
+        d += e;
+        d ^= e >> 16;
+        g += d;
+        e += f;
+        e ^= f << 10;
+        h += e;
+        f += g;
+        f ^= g >> 4;
+        a += f;
+        g += h;
+        g ^= h << 8;
+        b += g;
+        h += a;
+        h ^= a >> 9;
+        c += h;
+        a += b;
+        memory[i] = a;
+        memory[i + 1] = b;
+        memory[i + 2] = c;
+        memory[i + 3] = d;
+        memory[i + 4] = e;
+        memory[i + 5] = f;
+        memory[i + 6] = g;
+        memory[i + 7] = h;
     }
 
-    for (int k = 0; k < 256; k += 8) {
-        l += memory[k];
-        i1 += memory[k + 1];
-        j1 += memory[k + 2];
-        k1 += memory[k + 3];
-        l1 += memory[k + 4];
-        i2 += memory[k + 5];
-        j2 += memory[k + 6];
-        k2 += memory[k + 7];
-        l ^= i1 << 11;
-        k1 += l;
-        i1 += j1;
-        i1 ^= (unsigned int)j1 >> 2;
-        l1 += i1;
-        j1 += k1;
-        j1 ^= k1 << 8;
-        i2 += j1;
-        k1 += l1;
-        k1 ^= (unsigned int)l1 >> 16;
-        j2 += k1;
-        l1 += i2;
-        l1 ^= i2 << 10;
-        k2 += l1;
-        i2 += j2;
-        i2 ^= (unsigned int)j2 >> 4;
-        l += i2;
-        j2 += k2;
-        j2 ^= k2 << 8;
-        i1 += j2;
-        k2 += l;
-        k2 ^= (unsigned int)l >> 9;
-        j1 += k2;
-        l += i1;
-        memory[k] = l;
-        memory[k + 1] = i1;
-        memory[k + 2] = j1;
-        memory[k + 3] = k1;
-        memory[k + 4] = l1;
-        memory[k + 5] = i2;
-        memory[k + 6] = j2;
-        memory[k + 7] = k2;
+    if (flag)
+    {
+        for (i = 0; i < size; i += 8)
+        {
+            a += memory[i];
+            b += memory[i + 1];
+            c += memory[i + 2];
+            d += memory[i + 3];
+            e += memory[i + 4];
+            f += memory[i + 5];
+            g += memory[i + 6];
+            h += memory[i + 7];
+            a ^= b << 11;
+            d += a;
+            b += c;
+            b ^= c >> 2;
+            e += b;
+            c += d;
+            c ^= d << 8;
+            f += c;
+            d += e;
+            d ^= e >> 16;
+            g += d;
+            e += f;
+            e ^= f << 10;
+            h += e;
+            f += g;
+            f ^= g >> 4;
+            a += f;
+            g += h;
+            g ^= h << 8;
+            b += g;
+            h += a;
+            h ^= a >> 9;
+            c += h;
+            a += b;
+            memory[i] = a;
+            memory[i + 1] = b;
+            memory[i + 2] = c;
+            memory[i + 3] = d;
+            memory[i + 4] = e;
+            memory[i + 5] = f;
+            memory[i + 6] = g;
+            memory[i + 7] = h;
+        }
     }
 
     isaac();
-    count = 256;
+    count = size;
 }
