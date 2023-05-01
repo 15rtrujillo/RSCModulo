@@ -1,6 +1,8 @@
 #include <memory>
 #include <string>
 
+#include "Buffer.h"
+
 #ifndef PACKET_H
 #define PACKET_H
 
@@ -33,14 +35,20 @@ public:
 	/// <summary>
 	/// Get the entire payload buffer
 	/// </summary>
-	/// <returns>A shared pointer to the payload buffer</returns>
-	std::shared_ptr<char[]> getPayload() const;
+	/// <returns>A reference to the payload buffer</returns>
+	Buffer& getPayload();
 
 	/// <summary>
 	/// Get the length of the packet's payload
 	/// </summary>
 	/// <returns>The length of the payload</returns>
-	int getLength() const;
+	int getReadableBytes() const;
+
+	/// <summary>
+	/// Get the current read index
+	/// </summary>
+	/// <returns>The index of the data being read</returns>
+	int getReadPosition() const;
 
 	/// <summary>
 	/// Read a single byte from the packet
@@ -112,17 +120,7 @@ private:
 	/// <summary>
 	/// The data payload of the packet
 	/// </summary>
-	std::shared_ptr<char[]> payload;
-
-	/// <summary>
-	/// The length of the payload buffer
-	/// </summary>
-	int payloadLength;
-
-	/// <summary>
-	/// The current read index of the packet
-	/// </summary>
-	int readIndex = 0;
+	Buffer payload;
 
 	/// <summary>
 	/// Used for keeping track of the packet number

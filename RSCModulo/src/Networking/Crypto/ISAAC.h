@@ -61,6 +61,12 @@ public:
 	/// <param name="flag">Flag indicating if we should perform a second pass.</param>
 	void initialize(bool flag);
 
+	/// <summary>
+	/// Check if the keys have been set for this ISAAC instance
+	/// </summary>
+	/// <returns>True if the keys have been set</returns>
+	bool areKeysSet();
+
 private:
 	/// <summary>
 	/// The count through the results
@@ -91,6 +97,11 @@ private:
 	/// The counter
 	/// </summary>
 	int c;
+
+	/// <summary>
+	/// Have the keys been set?
+	/// </summary>
+	bool keysSet;
 };
 
 #endif

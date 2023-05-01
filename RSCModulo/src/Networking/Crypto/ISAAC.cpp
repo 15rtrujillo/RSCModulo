@@ -1,6 +1,8 @@
+#include <memory>
+
 #include "ISAAC.h"
 
-ISAAC::ISAAC() : count(0), a(0), b(0), c(0)
+ISAAC::ISAAC() : count(0), a(0), b(0), c(0), keysSet(false)
 {
     for (int i = 0; i < size; ++i)
     {
@@ -11,11 +13,8 @@ ISAAC::ISAAC() : count(0), a(0), b(0), c(0)
 
 void ISAAC::setKeys(int seed[], int seedLen)
 {
-    for (int i = 0; i < seedLen; i++)
-    {
-        results[i] = seed[i];
-    }
-
+    keysSet = true;
+    memcpy(results, seed, seedLen);
     initialize(true);
 }
 
@@ -231,4 +230,9 @@ void ISAAC::initialize(bool flag)
 
     isaac();
     count = size;
+}
+
+bool ISAAC::areKeysSet()
+{
+    return keysSet;
 }

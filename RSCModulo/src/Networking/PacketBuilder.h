@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include "Buffer.h"
 #include "Packet.h"
 
 /// <summary>
@@ -24,7 +25,7 @@ public:
 	/// Get the length of the packet builder's current payload
 	/// </summary>
 	/// <returns>The length of the payload</returns>
-	int getLength() const;
+	int getWritePosition() const;
 
 	/// <summary>
 	/// Create a packet form the current packet builder
@@ -46,13 +47,19 @@ public:
 	void writeBytes(char bytes[], int bytesLen);
 
 	/// <summary>
-	/// Set up the Packet Builder so that bits can be written to the payload.
+	/// Write a Buffer of bytes to the buffer
+	/// </summary>
+	/// <param name="bytes">The Buffer of bytes to write</param>
+	void writeBytes(Buffer bytes);
+
+	/// <summary>
+	/// Set up the buffer so that bits can be written.
 	/// Must be called before writing bits.
 	/// </summary>
 	void startBitAccess();
 
 	/// <summary>
-	/// Restore the original functionality of the Packet Builder.
+	/// Restore the original functionality of the buffer.
 	/// Should be called after writing bits.
 	/// </summary>
 	void finishBitAccess();
@@ -107,23 +114,6 @@ public:
 	void writeZeroPaddedString(std::string s);
 
 private:
-	static const int bitMaskSize = 32;
-
-	/// <summary>
-	/// Bit mask array
-	/// </summary>
-	static int bitMaskOut[];
-
-	/// <summary>
-	/// Used to only initialize the bit mask once
-	/// </summary>
-	static bool bitMaskInitialized;
-
-	/// <summary>
-	/// Initialize the bit mask with values
-	/// </summary>
-	static void initBitMask();
-
 	/// <summary>
 	/// The packet's opcode
 	/// </summary>
@@ -132,29 +122,7 @@ private:
 	/// <summary>
 	/// The data payload of the packet
 	/// </summary>
-	std::unique_ptr<char[]> payload;
-
-	/// <summary>
-	/// The position to write bits
-	/// </summary>
-	int bitPosition;
-
-	/// <summary>
-	/// The current write index of the packet
-	/// </summary>
-	int writePosition;
-
-	/// <summary>
-	/// The current possible size of the payload
-	/// </summary>
-	int capacity;
-
-	/// <summary>
-	/// Makes sure the payload buffer is large enough to write the specified number of bytes.
-	/// If not, we reallocate a larger array
-	/// </summary>
-	/// <param name="bytesToWrite">How many bytes are about to be written to the buffer</param>
-	void checkAndResize(size_t bytesToWrite);
+	Buffer payload;
 };
 
 #endif

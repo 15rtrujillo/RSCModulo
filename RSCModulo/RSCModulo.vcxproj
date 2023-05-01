@@ -142,21 +142,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Networking\Crypto\Cryptography.cpp" />
+    <ClCompile Include="src\Networking\Buffer.cpp" />
     <ClCompile Include="src\Utils\ConfigFile.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Networking\ISAAC.cpp" />
+    <ClCompile Include="src\Networking\Crypto\ISAAC.cpp" />
     <ClCompile Include="src\Networking\Networking.cpp" />
     <ClCompile Include="src\Networking\Packet.cpp" />
     <ClCompile Include="src\Networking\PacketBuilder.cpp" />
     <ClCompile Include="src\Utils\Logger.cpp" />
+    <ClCompile Include="src\Utils\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Networking\Crypto\Cryptography.h" />
+    <ClInclude Include="src\Networking\Buffer.h" />
     <ClInclude Include="src\Utils\ConfigFile.h" />
     <ClInclude Include="src\Networking\Networking.h" />
-    <ClInclude Include="src\Networking\ISAAC.h" />
+    <ClInclude Include="src\Networking\Crypto\ISAAC.h" />
     <ClInclude Include="src\Networking\Packet.h" />
     <ClInclude Include="src\Networking\PacketBuilder.h" />
     <ClInclude Include="src\Utils\Logger.h" />
+    <ClInclude Include="src\Utils\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

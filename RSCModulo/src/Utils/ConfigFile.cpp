@@ -6,6 +6,13 @@ ConfigFile::ConfigFile(const std::string &fileName)
 {
     std::fstream configFile;
     configFile.open(fileName, std::ios::in);
+
+    if (configFile.fail())
+    {
+        errorOccurred = true;
+        return;
+    }
+
     std::string line;
     while (std::getline(configFile, line))
     {
@@ -19,6 +26,14 @@ ConfigFile::ConfigFile(const std::string &fileName)
         configs[key] = value;
     }
     configFile.close();
+
+    if (settingsCount() < 1)
+    {
+        errorOccurred = true;
+        return;
+    }
+
+    errorOccurred = false;
 }
 
 int ConfigFile::settingsCount() const
@@ -35,4 +50,9 @@ std::string ConfigFile::getSetting(const std::string& setting) const
     }
 
     return iterator->second;
+}
+
+bool ConfigFile::error() const
+{
+    return errorOccurred;
 }

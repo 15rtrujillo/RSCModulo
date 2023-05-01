@@ -25,8 +25,22 @@ public:
 	/// <returns>The specified setting's value</returns>
 	std::string getSetting(const std::string &setting) const;
 
+	/// <summary>
+	/// Check if an error has occurred while reading the config file
+	/// </summary>
+	/// <returns>True if an error has occurred</returns>
+	bool error() const;
+
 private:
+	/// <summary>
+	/// Stores the settings and their values
+	/// </summary>
 	std::map<std::string, std::string> configs;
+
+	/// <summary>
+	/// Set if an error has occurred reading the config file
+	/// </summary>
+	bool errorOccurred;
 };
 
 #endif

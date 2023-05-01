@@ -1,20 +1,9 @@
 #include "PacketBuilder.h"
 
-// Initialize static members
-int PacketBuilder::bitMaskOut[PacketBuilder::bitMaskSize];
-bool PacketBuilder::bitMaskInitialized = false;
-
-PacketBuilder::PacketBuilder(char opcode)
+PacketBuilder::PacketBuilder(char opcode) :
+	opcode(opcode), payload(128)
 {
-	this->opcode = opcode;
-	writePosition = 0;
-	capacity = 1;
-	payload = std::make_unique<char[]>(capacity);
 
-	if (!bitMaskInitialized)
-	{
-		initBitMask();
-	}
 }
 
 char PacketBuilder::getOpcode() const
@@ -22,150 +11,82 @@ char PacketBuilder::getOpcode() const
 	return opcode;
 }
 
-int PacketBuilder::getLength() const
+int PacketBuilder::getWritePosition() const
 {
-	return writePosition;
+	return payload.getReadableBytes();
 }
 
 Packet PacketBuilder::toPacket()
 {
-	std::unique_ptr<char[]> packetPayload = std::make_unique<char[]>(writePosition);
-	std::memcpy(packetPayload.get(), payload.get(), writePosition);
+	int packetLen = payload.getReadableBytes();
 
-	return Packet(opcode, std::move(packetPayload), writePosition);
+	std::unique_ptr<char[]> packetPayload = std::make_unique<char[]>(packetLen);
+	std::memcpy(packetPayload.get(), payload.getData().get(), packetLen);
+
+	return Packet(opcode, std::move(packetPayload), packetLen);
 }
 
 void PacketBuilder::writeByte(char byte)
 {
-	checkAndResize(sizeof(byte));
-	payload[writePosition++] = byte;
+	payload.writeByte(byte);
 }
 
 void PacketBuilder::writeBytes(char bytes[], int bytesLen)
 {
-	checkAndResize(bytesLen);
-	std::memcpy(payload.get() + writePosition, bytes, bytesLen);
-	writePosition += bytesLen;
+	payload.writeBytes(bytes, bytesLen);
+}
+
+void PacketBuilder::writeBytes(Buffer bytes)
+{
+	writeBytes(bytes.getData().get(), bytes.getReadableBytes());
 }
 
 void PacketBuilder::startBitAccess()
 {
-	bitPosition = writePosition * 8;
+	payload.startBitAccess();
 }
 
 void PacketBuilder::finishBitAccess()
 {
-	writePosition = (bitPosition + 7) / 8;
+	payload.finishBitAccess();
 }
 
 void PacketBuilder::writeBits(int value, int numBits)
 {
+	payload.writeBits(value, numBits);
 }
 
 void PacketBuilder::writeUnsignedByte(unsigned char uByte)
 {
-	checkAndResize(sizeof(uByte));
-	payload[writePosition++] = uByte;
+	payload.writeUnsignedByte(uByte);
 }
 
 void PacketBuilder::writeShort(short s)
 {
-	size_t dataLen = sizeof(s);
-	checkAndResize(dataLen);
-
-	short* writeLocation = reinterpret_cast<short*>(payload.get() + writePosition);
-	*writeLocation = s;
-
-	writePosition += dataLen;
+	payload.writeShort(s);
 }
 
 void PacketBuilder::writeUnsignedShort(unsigned short us)
 {
-	size_t dataLen = sizeof(us);
-	checkAndResize(dataLen);
-
-	unsigned short* writeLocation = reinterpret_cast<unsigned short*>(payload.get() + writePosition);
-	*writeLocation = us;
-
-	writePosition += dataLen;
+	payload.writeUnsignedShort(us);
 }
 
 void PacketBuilder::writeInt(int i)
 {
-	size_t dataLen = sizeof(i);
-	checkAndResize(dataLen);
-
-	int* writeLocation = reinterpret_cast<int*>(payload.get() + writePosition);
-	*writeLocation = i;
-
-	writePosition += dataLen;
+	payload.writeInt(i);
 }
 
 void PacketBuilder::writeLong(long l)
 {
-	size_t dataLen = sizeof(l);
-	checkAndResize(dataLen);
-
-	long* writeLocation = reinterpret_cast<long*>(payload.get() + writePosition);
-	*writeLocation = l;
-
-	writePosition += dataLen;
+	payload.writeLong(l);
 }
 
 void PacketBuilder::writeLineFeedString(std::string s)
 {
-	// Account for the \n character
-	checkAndResize(s.size() + 1);
-
-	// Copy everything but the null terminator
-	memcpy(payload.get() + writePosition, s.c_str(), s.size());
-	writePosition += s.size();
-
-	// Append the \n character
-	payload[writePosition++] = 10;
+	payload.writeLineFeedString(s);
 }
 
 void PacketBuilder::writeZeroPaddedString(std::string s)
 {
-	// Account for the two null characters
-	checkAndResize(s.size() + 2);
-
-	// Append the first null character
-	payload[writePosition++] = 0;
-
-	// Copy everything but the null terminator
-	memcpy(payload.get() + writePosition, s.c_str(), s.size());
-	writePosition += s.size();
-
-	// Append the final null character
-	payload[writePosition++] = 0;
-}
-
-void PacketBuilder::initBitMask()
-{
-	for (int i = 0; i < bitMaskSize; ++i)
-	{
-		bitMaskOut[i] = (1 << i) - 1;
-	}
-
-	bitMaskInitialized = true;
-}
-
-void PacketBuilder::checkAndResize(size_t bytesToWrite)
-{
-	int newSize = bytesToWrite + writePosition;
-
-	if (newSize > capacity)
-	{
-		// Calculate new capacity
-		size_t newCapacity = std::max(2 * capacity, newSize);
-
-		// Allocate new payload array and copy old payload
-		std::unique_ptr<char[]> newPayload = std::make_unique<char[]>(newCapacity);
-		std::memcpy(newPayload.get(), payload.get(), writePosition);
-
-		// Reset unique_ptr and update capacity
-		payload = std::move(newPayload);
-		capacity = newCapacity;
-	}
+	payload.writeZeroPaddedString(s);
 }
