@@ -65,61 +65,51 @@ std::unique_ptr<unsigned char[]> Cryptography::rsaEncrypt(unsigned char toEncryp
     return std::move(encryptedMessage);
 }
 
-void Cryptography::xteaEncrypt(unsigned char data[], int length, const int keys[])
+void Cryptography::xteaEncrypt(Buffer& toEncrypt, int key[])
 {
-    int blocks = length / 8;
-    uint32_t* input = reinterpret_cast<uint32_t*>(&data[0]);
-    uint32_t v0, v1, sum;
+    // This doubles as the size of the buffer
+    int currentWritePos = toEncrypt.getReadableBytes();
+    //int currentWritePos = 0;
+    int currentReadPos = toEncrypt.getReadPosition();
 
-    for (int i = 0; i < blocks; i++)
+    toEncrypt.setReadPosition(0);
+    toEncrypt.setWritePosition(0);
+
+    int blocks = currentWritePos / 8;
+
+    for (int i = 0; i < blocks; ++i)
     {
-        v0 = input[2 * i];
-        v1 = input[2 * i + 1];
-        sum = 0;
-        for (int j = 0; j < XTEA_NUM_ROUNDS; j++) {
-            v0 += (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (sum + keys[sum & 3]);
-            sum += XTEA_DELTA;
-            v1 += (((v0 << 4) ^ (v0 >> 5)) + v0) ^ (sum + keys[(sum >> 11) & 3]);
+        /* This function expects big - endian ints, so we have to read them with magic
+        int v0 = *reinterpret_cast<unsigned int*>(toEncrypt.getData().get() + currentReadPos);
+        currentReadPos += 4;
+        int v1 = *reinterpret_cast<unsigned int*>(toEncrypt.getData().get() + currentReadPos);
+        currentReadPos += 4;
+        */
+        int v0 = toEncrypt.readUnsignedInt();
+        int v1 = toEncrypt.readUnsignedInt();
+        int sum = 0;
+        int delta = -1640531527;
+
+        for (int j = 32; j-- > 0; v1 += (((unsigned int)v0 >> 5) ^ (v0 << 4)) + v0 ^ sum + key[((unsigned int)sum >> 11) & 1356857347]) {
+            v0 += v1 + ((v1 << 4) ^ ((unsigned int)v1 >> 5)) ^ sum + key[3 & sum];
+            sum += delta;
         }
-        input[2 * i] = v0;
-        input[2 * i + 1] = v1;
+
+        /* We'll write them back the way they are
+        int* writeLocation = reinterpret_cast<int*>(toEncrypt.getData().get() + currentWritePos);
+        *writeLocation = v0;
+        currentWritePos += 4;
+        writeLocation = reinterpret_cast<int*>(toEncrypt.getData().get() + currentWritePos);
+        *writeLocation = v1;
+        currentWritePos += 4;
+        */
+        toEncrypt.writeInt(v0);
+        toEncrypt.writeInt(v1);
     }
 
-    // Convert from little-endian to big-endian
-    for (int i = 0; i < length; i += 4)
-    {
-        uint32_t& word = input[i / 4];
-        word = ((word << 24) & 0xff000000) |
-            ((word << 8) & 0x00ff0000) |
-            ((word >> 8) & 0x0000ff00) |
-            ((word >> 24) & 0x000000ff);
-    }
+    toEncrypt.setReadPosition(currentReadPos);
+    toEncrypt.setWritePosition(currentWritePos);
 }
-
-//void Cryptography::xteaEncrypt(Buffer& toEncrypt, int key[])
-//{
-//    // This doubles as the size of the buffer
-//    int currentWritePos = toEncrypt.getReadableBytes();
-//
-//    int blocks = currentWritePos / 8;
-//
-//    for (int i = 0; i < blocks; ++i) {
-//        int v0 = toEncrypt.readUnsignedInt();
-//        int v1 = toEncrypt.readUnsignedInt();
-//        int sum = 0;
-//        int delta = -1640531527;
-//
-//        for (int j = 32; j-- > 0; v1 += ((v0 >> 5) ^ (v0 << 4)) + v0 ^ sum + key[(sum >> 11) & 1356857347]) {
-//            v0 += v1 + ((v1 << 4) ^ (v1 >> 5)) ^ sum + key[3 & sum];
-//            sum += delta;
-//        }
-//
-//        toEncrypt.writeInt(v0);
-//        toEncrypt.writeInt(v1);
-//    }
-//
-//    toEncrypt.setWritePosition(currentWritePos);
-//}
 
 std::unique_ptr<int[]> Cryptography::generateKeysOrNonces(int size)
 {

@@ -52,7 +52,7 @@ void ISAAC::isaac()
         results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
 
         x = memory[i];
-        a ^= a >> 6;
+        a ^= (unsigned int)a >> 6;
         a += memory[j++];
         memory[i] = y = memory[(x & mask) >> 2] + a + b;
         results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
@@ -64,7 +64,7 @@ void ISAAC::isaac()
         results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
 
         x = memory[i];
-        a ^= a >> 16;
+        a ^= (unsigned int)a >> 16;
         a += memory[j++];
         memory[i] = y = memory[(x & mask) >> 2] + a + b;
         results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
@@ -79,7 +79,7 @@ void ISAAC::isaac()
         results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
 
         x = memory[i];
-        a ^= a >> 6;
+        a ^= (unsigned int)a >> 6;
         a += memory[j++];
         memory[i] = y = memory[(x & mask) >> 2] + a + b;
         results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
@@ -91,7 +91,7 @@ void ISAAC::isaac()
         results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
 
         x = memory[i];
-        a ^= a >> 16;
+        a ^= (unsigned int)a >> 16;
         a += memory[j++];
         memory[i] = y = memory[(x & mask) >> 2] + a + b;
         results[i++] = b = memory[((y >> sizeLog) & mask) >> 2] + x;
@@ -110,25 +110,25 @@ void ISAAC::initialize(bool flag)
         a ^= b << 11;
         d += a;
         b += c;
-        b ^= c >> 2;
+        b ^= (unsigned int)c >> 2;
         e += b;
         c += d;
         c ^= d << 8;
         f += c;
         d += e;
-        d ^= e >> 16;
+        d ^= (unsigned int)e >> 16;
         g += d;
         e += f;
         e ^= f << 10;
         h += e;
         f += g;
-        f ^= g >> 4;
+        f ^= (unsigned int)g >> 4;
         a += f;
         g += h;
         g ^= h << 8;
         b += g;
         h += a;
-        h ^= a >> 9;
+        h ^= (unsigned int)a >> 9;
         c += h;
         a += b;
     }
@@ -150,25 +150,25 @@ void ISAAC::initialize(bool flag)
         a ^= b << 11;
         d += a;
         b += c;
-        b ^= c >> 2;
+        b ^= (unsigned int)c >> 2;
         e += b;
         c += d;
         c ^= d << 8;
         f += c;
         d += e;
-        d ^= e >> 16;
+        d ^= (unsigned int)e >> 16;
         g += d;
         e += f;
         e ^= f << 10;
         h += e;
         f += g;
-        f ^= g >> 4;
+        f ^= (unsigned int)g >> 4;
         a += f;
         g += h;
         g ^= h << 8;
         b += g;
         h += a;
-        h ^= a >> 9;
+        h ^= (unsigned int)a >> 9;
         c += h;
         a += b;
         memory[i] = a;
@@ -196,25 +196,25 @@ void ISAAC::initialize(bool flag)
             a ^= b << 11;
             d += a;
             b += c;
-            b ^= c >> 2;
+            b ^= (unsigned int)c >> 2;
             e += b;
             c += d;
             c ^= d << 8;
             f += c;
             d += e;
-            d ^= e >> 16;
+            d ^= (unsigned int)e >> 16;
             g += d;
             e += f;
             e ^= f << 10;
             h += e;
             f += g;
-            f ^= g >> 4;
+            f ^= (unsigned int)g >> 4;
             a += f;
             g += h;
             g ^= h << 8;
             b += g;
             h += a;
-            h ^= a >> 9;
+            h ^= (unsigned int)a >> 9;
             c += h;
             a += b;
             memory[i] = a;

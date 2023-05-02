@@ -57,16 +57,7 @@ public:
 	/// </summary>
 	/// <param name="toEncrypt">The buffer to encrypt</param>
 	/// <param name="key">The key used to encrypt</param>
-	//static void xteaEncrypt(Buffer& toEncrypt, int key[]);
-
-	/// <summary>
-	/// Encrypt a buffer using XTEA
-	/// </summary>
-	/// <param name="data">The data to be encrypted</param>
-	/// <param name="length">The length of the data</param>
-	/// <param name="keys">The key used to encrypt</param>
-	/// <param name="output">The encrypted data</param>
-	static void xteaEncrypt(unsigned char data[], int length, const int keys[]);
+	static void xteaEncrypt(Buffer& toEncrypt, int key[]);
 
 	/// <summary>
 	/// Generates large, random numbers to use as nonces or keys
