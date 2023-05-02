@@ -36,7 +36,7 @@ void Cryptography::setRSAExponent(std::string exponent)
 	rsaExponent = cpp_int(exponent);
 }
 
-std::unique_ptr<char[]> Cryptography::rsaEncrypt(char toEncrypt[], int toEncryptLen, int* encryptedMessageLen)
+std::unique_ptr<unsigned char[]> Cryptography::rsaEncrypt(unsigned char toEncrypt[], int toEncryptLen, int* encryptedMessageLen)
 {
     // Convert to a big int
     cpp_int dataBigInt = 0;
@@ -49,7 +49,7 @@ std::unique_ptr<char[]> Cryptography::rsaEncrypt(char toEncrypt[], int toEncrypt
     cpp_int encrypted = powm(dataBigInt, rsaExponent, rsaModulus);
 
     // Convert encrypted BigInteger to a byte buffer
-    std::vector<char> encryptedBuffer;
+    std::vector<unsigned char> encryptedBuffer;
     while (encrypted > 0) {
         encryptedBuffer.insert(encryptedBuffer.begin(), (unsigned char)(encrypted % 256));
         encrypted /= 256;
@@ -57,13 +57,13 @@ std::unique_ptr<char[]> Cryptography::rsaEncrypt(char toEncrypt[], int toEncrypt
 
     *encryptedMessageLen = static_cast<int>(encryptedBuffer.size());
 
-    std::unique_ptr<char[]> encryptedMessage(new char[*encryptedMessageLen]);
+    std::unique_ptr<unsigned char[]> encryptedMessage(new unsigned char[*encryptedMessageLen]);
     std::copy(encryptedBuffer.begin(), encryptedBuffer.end(), encryptedMessage.get());
 
     return std::move(encryptedMessage);
 }
 
-void Cryptography::xteaEncrypt(char toEncrypt[], int toEncryptLen, int key[])
+void Cryptography::xteaEncrypt(unsigned char toEncrypt[], int toEncryptLen, int key[])
 {
     // Make sure data is aligned to 8 bytes
     int extraBytes = toEncryptLen % 8;

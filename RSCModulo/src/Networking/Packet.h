@@ -18,7 +18,7 @@ public:
 	/// <param name="opcode">The packet's opcode</param>
 	/// <param name="payload">The packet's payload</param>
 	/// <param name="payloadLength">The length of the payload</param>
-	Packet(char opcode, std::shared_ptr<char[]> payload, int payloadLength);
+	Packet(char opcode, std::shared_ptr<unsigned char[]> payload, int payloadLength);
 
 	/// <summary>
 	/// Get the packet number
@@ -51,6 +51,12 @@ public:
 	int getReadPosition() const;
 
 	/// <summary>
+	/// Set the read position for the buffer
+	/// </summary>
+	/// <param name="newReadPosition">The new read position</param>
+	void setReadPosition(int newReadPosition);
+
+	/// <summary>
 	/// Read a single byte from the packet
 	/// </summary>
 	/// <returns>A byte from the packet</returns>
@@ -61,7 +67,7 @@ public:
 	/// </summary>
 	/// <param name="length">The amount of bytes to read</param>
 	/// <returns>A new array of the read bytes</returns>
-	std::unique_ptr<char[]> readBytes(int length);
+	std::unique_ptr<unsigned char[]> readBytes(int length);
 
 	/// <summary>
 	/// Read a single unsigned byte from the packet

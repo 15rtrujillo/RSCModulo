@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 
 	std::cout << "]" << std::endl;
 
-	std::unique_ptr<char[]> encryptedLoginBlock = Cryptography::rsaEncrypt(
+	std::unique_ptr<unsigned char[]> encryptedLoginBlock = Cryptography::rsaEncrypt(
 		loginBlock.getData().get(), loginBlock.getReadableBytes(), encryptedLen.get());
 
 	std::cout << "[";

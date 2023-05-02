@@ -8,7 +8,7 @@ long Packet::getNextPacketNumber()
 	return nextPacketNumber++;
 }
 
-Packet::Packet(char opcode, std::shared_ptr<char[]> payload, int payloadLength) : 
+Packet::Packet(char opcode, std::shared_ptr<unsigned char[]> payload, int payloadLength) :
 	opcode(opcode), payload(payload, payloadLength), packetNumber(getPacketNumber())
 {
 
@@ -39,12 +39,17 @@ int Packet::getReadPosition() const
 	return payload.getReadPosition();
 }
 
+void Packet::setReadPosition(int newReadPosition)
+{
+	payload.setReadPosition(newReadPosition);
+}
+
 char Packet::readByte()
 {
 	return payload.readByte();
 }
 
-std::unique_ptr<char[]> Packet::readBytes(int length)
+std::unique_ptr<unsigned char[]> Packet::readBytes(int length)
 {
 	return payload.readBytes(length);
 }

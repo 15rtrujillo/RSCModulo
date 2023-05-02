@@ -16,11 +16,16 @@ int PacketBuilder::getWritePosition() const
 	return payload.getReadableBytes();
 }
 
+void PacketBuilder::setWritePosition(int newWritePosition)
+{
+	payload.setWritePosition(newWritePosition);
+}
+
 Packet PacketBuilder::toPacket()
 {
 	int packetLen = payload.getReadableBytes();
 
-	std::unique_ptr<char[]> packetPayload = std::make_unique<char[]>(packetLen);
+	std::unique_ptr<unsigned char[]> packetPayload = std::make_unique<unsigned char[]>(packetLen);
 	std::memcpy(packetPayload.get(), payload.getData().get(), packetLen);
 
 	return Packet(opcode, std::move(packetPayload), packetLen);
@@ -31,7 +36,7 @@ void PacketBuilder::writeByte(char byte)
 	payload.writeByte(byte);
 }
 
-void PacketBuilder::writeBytes(char bytes[], int bytesLen)
+void PacketBuilder::writeBytes(unsigned char bytes[], int bytesLen)
 {
 	payload.writeBytes(bytes, bytesLen);
 }

@@ -18,13 +18,13 @@ public:
 	/// </summary>
 	/// <param name="data">The data to initialize the buffer with</param>
 	/// <param name="dataLen">The length of the data</param>
-	Buffer(std::shared_ptr<char[]> data, int dataLen);
+	Buffer(std::shared_ptr<unsigned char[]> data, int dataLen);
 
 	/// <summary>
 	/// Get the entire data buffer
 	/// </summary>
 	/// <returns>A shared pointer to the data buffer</returns>
-	std::shared_ptr<char[]> getData() const;
+	std::shared_ptr<unsigned char[]> getData() const;
 
 	/// <summary>
 	/// Get the read index
@@ -33,17 +33,29 @@ public:
 	int getReadPosition() const;
 
 	/// <summary>
+	/// Set the read position for the buffer
+	/// </summary>
+	/// <param name="newReadPosition">The new read position</param>
+	void setReadPosition(int newReadPosition);
+
+	/// <summary>
 	/// Get the write position of the buffer. This doubles as current length of the data
 	/// </summary>
 	/// <returns>The length of the data</returns>
 	int getReadableBytes() const;
 
 	/// <summary>
+	/// Set the write position of the buffer
+	/// </summary>
+	/// <param name="newWritePosition">The new write position</param>
+	void setWritePosition(int newWritePosition);
+
+	/// <summary>
 	/// Read a specific amount of bytes
 	/// </summary>
 	/// <param name="length">The amount of bytes to read</param>
 	/// <returns>A new array of the read bytes</returns>
-	std::unique_ptr<char[]> readBytes(int length);
+	std::unique_ptr<unsigned char[]> readBytes(int length);
 
 	/// <summary>
 	/// Read a single byte
@@ -99,7 +111,7 @@ public:
 	/// </summary>
 	/// <param name="bytes">The bytes to write</param>
 	/// <param name="bytesLen">The length of the bytes to write</param>
-	void writeBytes(char bytes[], int bytesLen);
+	void writeBytes(unsigned char bytes[], int bytesLen);
 
 	/// <summary>
 	/// Write a Buffer of bytes to the buffer
@@ -208,7 +220,7 @@ private:
 	/// <summary>
 	/// The data
 	/// </summary>
-	std::shared_ptr<char[]> data;
+	std::shared_ptr<unsigned char[]> data;
 
 	/// <summary>
 	/// The current read index of the buffer

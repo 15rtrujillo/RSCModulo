@@ -28,6 +28,12 @@ public:
 	int getWritePosition() const;
 
 	/// <summary>
+	/// Set the write position of the buffer
+	/// </summary>
+	/// <param name="newWritePosition">The new write position</param>
+	void setWritePosition(int newWritePosition);
+
+	/// <summary>
 	/// Create a packet form the current packet builder
 	/// </summary>
 	/// <returns>The new packet</returns>
@@ -44,7 +50,7 @@ public:
 	/// </summary>
 	/// <param name="bytes">The bytes to write</param>
 	/// <param name="bytesLen">The length of the bytes to write</param>
-	void writeBytes(char bytes[], int bytesLen);
+	void writeBytes(unsigned char bytes[], int bytesLen);
 
 	/// <summary>
 	/// Write a Buffer of bytes to the buffer

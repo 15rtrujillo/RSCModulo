@@ -8,7 +8,7 @@ int Buffer::bitMaskOut[Buffer::bitMaskSize];
 bool Buffer::bitMaskInitialized = false;
 
 Buffer::Buffer(int dataLen) :
-	data(std::make_unique<char[]>(dataLen)), readPosition(0), writePosition(0), bitPosition(),
+	data(std::make_unique<unsigned char[]>(dataLen)), readPosition(0), writePosition(0), bitPosition(),
 	capacity(dataLen)
 {
 	if (!bitMaskInitialized)
@@ -17,7 +17,7 @@ Buffer::Buffer(int dataLen) :
 	}
 }
 
-Buffer::Buffer(std::shared_ptr<char[]> data, int dataLen) :
+Buffer::Buffer(std::shared_ptr<unsigned char[]> data, int dataLen) :
 	data(data), readPosition(0), writePosition(dataLen), bitPosition(dataLen * 8), capacity(dataLen)
 {
 	if (!bitMaskInitialized)
@@ -26,7 +26,7 @@ Buffer::Buffer(std::shared_ptr<char[]> data, int dataLen) :
 	}
 }
 
-std::shared_ptr<char[]> Buffer::getData() const
+std::shared_ptr<unsigned char[]> Buffer::getData() const
 {
 	return data;
 }
@@ -36,13 +36,23 @@ int Buffer::getReadPosition() const
 	return readPosition;
 }
 
+void Buffer::setReadPosition(int newReadPosition)
+{
+	readPosition = newReadPosition;
+}
+
 int Buffer::getReadableBytes() const
 {
 	return writePosition;
 }
 
+void Buffer::setWritePosition(int newWritePosition)
+{
+	writePosition = newWritePosition;
+}
+
 template <typename T>
-T readBigEndianValue(char data[], int& readPosition)
+T readBigEndianValue(unsigned char data[], int& readPosition)
 {
 	// Determine the size of the value to read
 	size_t dataLen = sizeof(T);
@@ -63,9 +73,9 @@ T readBigEndianValue(char data[], int& readPosition)
 	return value;
 }
 
-std::unique_ptr<char[]> Buffer::readBytes(int length)
+std::unique_ptr<unsigned char[]> Buffer::readBytes(int length)
 {
-	std::unique_ptr<char[]> readBytes = std::make_unique<char[]>(length);
+	std::unique_ptr<unsigned char[]> readBytes = std::make_unique<unsigned char[]>(length);
 	std::memcpy(readBytes.get(), data.get() + readPosition, length);
 	readPosition += length;
 	return readBytes;
@@ -137,7 +147,7 @@ std::string Buffer::readZeroPaddedString()
 	return ss.str();
 }
 
-void Buffer::writeBytes(char bytes[], int bytesLen)
+void Buffer::writeBytes(unsigned char bytes[], int bytesLen)
 {
 	checkAndResize(bytesLen);
 	std::memcpy(data.get() + writePosition, bytes, bytesLen);
@@ -165,13 +175,13 @@ void Buffer::writeBits(int value, int numBits)
 }
 
 template <typename T>
-void writeBigEndianValue(T value, char data[], int& writePosition)
+void writeBigEndianValue(T value, unsigned char data[], int& writePosition)
 {
 	size_t dataLen = sizeof(value);
 
 	for (int i = dataLen - 1; i >= 0; --i)
 	{
-		data[writePosition++] = static_cast<char>(value >> (i * 8));
+		data[writePosition++] = static_cast<unsigned char>(value >> (i * 8));
 	}
 }
 
@@ -205,7 +215,7 @@ void Buffer::write3ByteInt(int i)
 	checkAndResize(dataLen);
 	for (int i = dataLen - 1; i >= 0; --i)
 	{
-		data[writePosition++] = static_cast<char>(i >> (i * 8));
+		data[writePosition++] = static_cast<unsigned char>(i >> (i * 8));
 	}
 }
 
@@ -281,7 +291,7 @@ void Buffer::checkAndResize(size_t bytesToWrite)
 		size_t newCapacity = std::max(2 * capacity, newSize);
 
 		// Allocate new data array and copy old data
-		std::unique_ptr<char[]> newData = std::make_unique<char[]>(newCapacity);
+		std::unique_ptr<unsigned char[]> newData = std::make_unique<unsigned char[]>(newCapacity);
 		std::memcpy(newData.get(), data.get(), writePosition);
 
 		// Reset unique_ptr and update capacity

@@ -47,9 +47,9 @@ public:
 	/// <param name="toEncryptLen">The length of the byte array</param>
 	/// <param name="encryptedMessageLen">The resulting encrypted byte array's length</param>
 	/// <returns>The encrypted data</returns>
-	static std::unique_ptr<char[]> rsaEncrypt(char toEncrypt[], int toEncryptLen, int* encryptedMessageLen);
+	static std::unique_ptr<unsigned char[]> rsaEncrypt(unsigned char toEncrypt[], int toEncryptLen, int* encryptedMessageLen);
 
-	static std::unique_ptr<char[]> rsaDecrypt(char toDecrypt[], int toDecryptLen, int* decryptedMessageLen);
+	static std::unique_ptr<unsigned char[]> rsaDecrypt(unsigned char toDecrypt[], int toDecryptLen, int* decryptedMessageLen);
 
 	/// <summary>
 	/// Encrypts a block of data using XTEA
@@ -58,7 +58,7 @@ public:
 	/// <param name="toEncryptLen">The length of the encrypted data</param>
 	/// <param name="key">The key for the XTEA encryption. This should be the same as the ISAAC key</param>
 	/// <returns>The encrypted data. It should be the same length as the original</returns>
-	static void xteaEncrypt(char toEncrypt[], int toEncryptLen, int key[]);
+	static void xteaEncrypt(unsigned char toEncrypt[], int toEncryptLen, int key[]);
 
 	/// <summary>
 	/// Generates large, random numbers to use as nonces or keys
