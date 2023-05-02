@@ -1,6 +1,7 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <memory>
 
+#include "..\Buffer.h"
 #include "ISAAC.h"
 
 #ifndef CRYPTOGRAPHY_H
@@ -52,13 +53,20 @@ public:
 	static std::unique_ptr<unsigned char[]> rsaDecrypt(unsigned char toDecrypt[], int toDecryptLen, int* decryptedMessageLen);
 
 	/// <summary>
-	/// Encrypts a block of data using XTEA
+	/// Encrypt a buffer using XTEA
 	/// </summary>
-	/// <param name="toEncrypt">The data to be encrypted</param>
-	/// <param name="toEncryptLen">The length of the encrypted data</param>
-	/// <param name="key">The key for the XTEA encryption. This should be the same as the ISAAC key</param>
-	/// <returns>The encrypted data. It should be the same length as the original</returns>
-	static void xteaEncrypt(unsigned char toEncrypt[], int toEncryptLen, int key[]);
+	/// <param name="toEncrypt">The buffer to encrypt</param>
+	/// <param name="key">The key used to encrypt</param>
+	//static void xteaEncrypt(Buffer& toEncrypt, int key[]);
+
+	/// <summary>
+	/// Encrypt a buffer using XTEA
+	/// </summary>
+	/// <param name="data">The data to be encrypted</param>
+	/// <param name="length">The length of the data</param>
+	/// <param name="keys">The key used to encrypt</param>
+	/// <param name="output">The encrypted data</param>
+	static void xteaEncrypt(unsigned char data[], int length, const int keys[]);
 
 	/// <summary>
 	/// Generates large, random numbers to use as nonces or keys
@@ -67,18 +75,11 @@ public:
 	/// <returns>The generated key/nonces</returns>
 	static std::unique_ptr<int[]> generateKeysOrNonces(int size);
 
+private:
 	static boost::multiprecision::cpp_int rsaModulus;
 	static boost::multiprecision::cpp_int rsaExponent;
-
-private:
-
-
-	/// <summary>
-	/// Helper function used for XTEA encryption
-	/// </summary>
-	/// <param name="data">Two, eight-byte block of data</param>
-	/// <param name="key">The 128-bit encryption key</param>
-	static void xteaEncrypt(uint32_t data[2], const uint32_t key[4]);
+	static const int XTEA_NUM_ROUNDS = 32;
+	static const int XTEA_DELTA = 0x9e3779b9;
 };
 
 #endif

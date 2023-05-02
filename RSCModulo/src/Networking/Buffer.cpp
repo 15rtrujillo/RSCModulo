@@ -54,21 +54,13 @@ void Buffer::setWritePosition(int newWritePosition)
 template <typename T>
 T readBigEndianValue(unsigned char data[], int& readPosition)
 {
-	// Determine the size of the value to read
+	T value = 0;
 	size_t dataLen = sizeof(T);
 
-	// Read the network byte order value from the buffer
-	uint32_t networkValue = 0;
-
-	for (int i = dataLen - 1; i >= 0; --i)
+	for (size_t i = 0; i < dataLen; ++i)
 	{
-		networkValue = (networkValue << 8) | static_cast<unsigned char>(data[readPosition + i]);
+		value |= static_cast<T>(static_cast<unsigned char>(data[readPosition++])) << ((dataLen - i - 1) * 8);
 	}
-
-	readPosition += dataLen;
-
-	// Convert the network byte order value to host byte order (native byte order)
-	T value = static_cast<T>(boost::asio::detail::socket_ops::network_to_host_long(networkValue));
 
 	return value;
 }
@@ -104,6 +96,11 @@ unsigned short Buffer::readUnsignedShort()
 int Buffer::readInt()
 {
 	return readBigEndianValue<int>(data.get(), readPosition);
+}
+
+unsigned int Buffer::readUnsignedInt()
+{
+	return readBigEndianValue<unsigned int>(data.get(), readPosition);
 }
 
 long Buffer::readLong()
@@ -209,13 +206,13 @@ void Buffer::writeUnsignedShort(unsigned short us)
 	writeBigEndianValue(us, data.get(), writePosition);
 }
 
-void Buffer::write3ByteInt(int i)
+void Buffer::write3ByteInt(int i3)
 {
 	size_t dataLen = 3;
-	checkAndResize(dataLen);
+
 	for (int i = dataLen - 1; i >= 0; --i)
 	{
-		data[writePosition++] = static_cast<unsigned char>(i >> (i * 8));
+		data[writePosition++] = static_cast<unsigned char>(i3 >> (i * 8));
 	}
 }
 
@@ -223,6 +220,12 @@ void Buffer::writeInt(int i)
 {
 	checkAndResize(sizeof(int));
 	writeBigEndianValue(i, data.get(), writePosition);
+}
+
+void Buffer::writeUnsignedInt(unsigned int ui)
+{
+	checkAndResize(sizeof(int));
+	writeBigEndianValue(ui, data.get(), writePosition);
 }
 
 void Buffer::writeLong(long l)

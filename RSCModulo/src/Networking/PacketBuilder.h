@@ -102,6 +102,12 @@ public:
 	void writeInt(int i);
 
 	/// <summary>
+	/// Write a single unsigned int to the buffer
+	/// </summary>
+	/// <param name="ui">The unsigned int to write</param>
+	void writeUnsignedInt(unsigned int ui);
+
+	/// <summary>
 	/// Write a single long to the buffer
 	/// </summary>
 	/// <param name="byte">The long to write</param>

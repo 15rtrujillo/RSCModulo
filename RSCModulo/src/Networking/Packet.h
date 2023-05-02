@@ -94,6 +94,12 @@ public:
 	int readInt();
 
 	/// <summary>
+	/// Read an unsigned int
+	/// </summary>
+	/// <returns>An unsigned int</returns>
+	unsigned int readUnsignedInt();
+
+	/// <summary>
 	/// Read a long from the packet
 	/// </summary>
 	/// <returns>A long from the packet</returns>

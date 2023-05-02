@@ -40,8 +40,7 @@ int main(int argc, char* argv[])
     // Java Strings are always unicode, so we need to use wstrings when taking input
 	// However, we have to convert the string before sending it over the network
 	std::wstring formattedPassword = Utils::formatPasswordString(20, password);
-	std::string utf8Password = Utils::convertUnicodeString(formattedPassword);
-	loginBlock.writeCString(utf8Password);
+	loginBlock.writeCString(Utils::convertUnicodeString(formattedPassword));
 
 	// Generate and write 5 nonces
 	std::unique_ptr<int[]> nonces = Cryptography::generateKeysOrNonces(5);
@@ -56,33 +55,12 @@ int main(int argc, char* argv[])
 
 	// Encrypt the login block
 	Cryptography::setRSAModulus(configFile.getSetting("rsa_modulus"));
-	std::cout << "mod " << Cryptography::rsaModulus.str() << std::endl;
 	Cryptography::setRSAExponent(configFile.getSetting("rsa_exponent"));
-	std::cout << "exponent " << Cryptography::rsaExponent.str() << std::endl;
 
 	std::unique_ptr<int> encryptedLen(new int);
 
-	std::cout << "[";
-
-	for (int i = 0; i < loginBlock.getReadableBytes(); ++i)
-	{
-		char byte = loginBlock.readByte();
-		std::cout << byte;
-	}
-
-	std::cout << "]" << std::endl;
-
 	std::unique_ptr<unsigned char[]> encryptedLoginBlock = Cryptography::rsaEncrypt(
 		loginBlock.getData().get(), loginBlock.getReadableBytes(), encryptedLen.get());
-
-	std::cout << "[";
-
-	for (int i = 0; i < *encryptedLen; ++i)
-	{
-		std::cout << encryptedLoginBlock[i];
-	}
-
-	std::cout << "]" << std::endl;
 
 	std::cout << std::endl << "og: " << loginBlock.getReadableBytes() << " encrypted: " << *encryptedLen << std::endl;
 
@@ -102,13 +80,15 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < 6; ++i)
 	{
 		xteaBlock.writeInt(noncesAgain[i]);
+		std::cout << "nonce " << (i + 6) << " " << nonces[i] << std::endl;
 	}
 
 	// Write the username
 	xteaBlock.writeCString(Utils::convertUnicodeString(username));
 
 	// Encrypt the XTEA block. This shouldn't need to be captured as a return value
-	Cryptography::xteaEncrypt(xteaBlock.getData().get(), xteaBlock.getReadableBytes(), key.get());
+	std::unique_ptr<unsigned char[]> output = std::make_unique<unsigned char[]>(xteaBlock.getReadableBytes());
+	//Cryptography::xteaEncrypt(xteaBlock.getData().get(), xteaBlock.getReadableBytes(), key.get());
 
 	packet.writeUnsignedShort(xteaBlock.getReadableBytes());
 	packet.writeBytes(xteaBlock);

@@ -81,6 +81,11 @@ void PacketBuilder::writeInt(int i)
 	payload.writeInt(i);
 }
 
+void PacketBuilder::writeUnsignedInt(unsigned int ui)
+{
+	payload.writeUnsignedInt(ui);
+}
+
 void PacketBuilder::writeLong(long l)
 {
 	payload.writeLong(l);

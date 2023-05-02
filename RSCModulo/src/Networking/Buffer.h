@@ -88,6 +88,12 @@ public:
 	int readInt();
 
 	/// <summary>
+	/// Read an unsigned int
+	/// </summary>
+	/// <returns>An unsigned int</returns>
+	unsigned int readUnsignedInt();
+
+	/// <summary>
 	/// Read a long
 	/// </summary>
 	/// <returns>A long</returns>
@@ -174,6 +180,12 @@ public:
 	/// </summary>
 	/// <param name="i">The int to write</param>
 	void writeInt(int i);
+
+	/// <summary>
+	/// Write a single unsigned int to the buffer
+	/// </summary>
+	/// <param name="ui">The unsigned int to write</param>
+	void writeUnsignedInt(unsigned int ui);
 
 	/// <summary>
 	/// Write a single long to the buffer

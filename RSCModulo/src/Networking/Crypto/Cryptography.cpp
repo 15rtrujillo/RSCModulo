@@ -40,7 +40,8 @@ std::unique_ptr<unsigned char[]> Cryptography::rsaEncrypt(unsigned char toEncryp
 {
     // Convert to a big int
     cpp_int dataBigInt = 0;
-    for (int i = 0; i < toEncryptLen; ++i) {
+    for (int i = 0; i < toEncryptLen; ++i)
+    {
         dataBigInt <<= 8;
         dataBigInt += toEncrypt[i];
     }
@@ -50,7 +51,8 @@ std::unique_ptr<unsigned char[]> Cryptography::rsaEncrypt(unsigned char toEncryp
 
     // Convert encrypted BigInteger to a byte buffer
     std::vector<unsigned char> encryptedBuffer;
-    while (encrypted > 0) {
+    while (encrypted > 0)
+    {
         encryptedBuffer.insert(encryptedBuffer.begin(), (unsigned char)(encrypted % 256));
         encrypted /= 256;
     }
@@ -63,27 +65,61 @@ std::unique_ptr<unsigned char[]> Cryptography::rsaEncrypt(unsigned char toEncryp
     return std::move(encryptedMessage);
 }
 
-void Cryptography::xteaEncrypt(unsigned char toEncrypt[], int toEncryptLen, int key[])
+void Cryptography::xteaEncrypt(unsigned char data[], int length, const int keys[])
 {
-    // Make sure data is aligned to 8 bytes
-    int extraBytes = toEncryptLen % 8;
+    int blocks = length / 8;
+    uint32_t* input = reinterpret_cast<uint32_t*>(&data[0]);
+    uint32_t v0, v1, sum;
 
-    if (extraBytes != 0)
+    for (int i = 0; i < blocks; i++)
     {
-        extraBytes = 8 - extraBytes;
-        toEncryptLen += extraBytes;
-        memset(toEncrypt + toEncryptLen - extraBytes, 0, extraBytes);
+        v0 = input[2 * i];
+        v1 = input[2 * i + 1];
+        sum = 0;
+        for (int j = 0; j < XTEA_NUM_ROUNDS; j++) {
+            v0 += (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (sum + keys[sum & 3]);
+            sum += XTEA_DELTA;
+            v1 += (((v0 << 4) ^ (v0 >> 5)) + v0) ^ (sum + keys[(sum >> 11) & 3]);
+        }
+        input[2 * i] = v0;
+        input[2 * i + 1] = v1;
     }
 
-    // Encrypt data in 8-byte blocks
-    uint32_t* dataWords = reinterpret_cast<uint32_t*>(toEncrypt);
-    uint32_t* keyWords = reinterpret_cast<uint32_t*>(const_cast<int*>(key));
-    int num_blocks = toEncryptLen / 8;
-    for (int i = 0; i < num_blocks; i++)
+    // Convert from little-endian to big-endian
+    for (int i = 0; i < length; i += 4)
     {
-        xteaEncrypt(dataWords + i * 2, keyWords);
+        uint32_t& word = input[i / 4];
+        word = ((word << 24) & 0xff000000) |
+            ((word << 8) & 0x00ff0000) |
+            ((word >> 8) & 0x0000ff00) |
+            ((word >> 24) & 0x000000ff);
     }
 }
+
+//void Cryptography::xteaEncrypt(Buffer& toEncrypt, int key[])
+//{
+//    // This doubles as the size of the buffer
+//    int currentWritePos = toEncrypt.getReadableBytes();
+//
+//    int blocks = currentWritePos / 8;
+//
+//    for (int i = 0; i < blocks; ++i) {
+//        int v0 = toEncrypt.readUnsignedInt();
+//        int v1 = toEncrypt.readUnsignedInt();
+//        int sum = 0;
+//        int delta = -1640531527;
+//
+//        for (int j = 32; j-- > 0; v1 += ((v0 >> 5) ^ (v0 << 4)) + v0 ^ sum + key[(sum >> 11) & 1356857347]) {
+//            v0 += v1 + ((v1 << 4) ^ (v1 >> 5)) ^ sum + key[3 & sum];
+//            sum += delta;
+//        }
+//
+//        toEncrypt.writeInt(v0);
+//        toEncrypt.writeInt(v1);
+//    }
+//
+//    toEncrypt.setWritePosition(currentWritePos);
+//}
 
 std::unique_ptr<int[]> Cryptography::generateKeysOrNonces(int size)
 {
@@ -97,18 +133,4 @@ std::unique_ptr<int[]> Cryptography::generateKeysOrNonces(int size)
     }
 
     return std::move(ptr);
-}
-
-void Cryptography::xteaEncrypt(uint32_t data[2], const uint32_t key[4])
-{
-    uint32_t sum = 0;
-    uint32_t delta = 0x9e3779b9;
-    uint32_t v0 = data[0], v1 = data[1];
-    for (int i = 0; i < 32; i++) {
-        v0 += (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (sum + key[sum & 3]);
-        sum += delta;
-        v1 += (((v0 << 4) ^ (v0 >> 5)) + v0) ^ (sum + key[(sum >> 11) & 3]);
-    }
-    data[0] = v0;
-    data[1] = v1;
 }

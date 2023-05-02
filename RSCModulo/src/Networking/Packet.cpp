@@ -74,6 +74,11 @@ int Packet::readInt()
 	return payload.readInt();
 }
 
+unsigned int Packet::readUnsignedInt()
+{
+	return payload.readUnsignedInt();
+}
+
 long Packet::readLong()
 {
 	return payload.readLong();
