@@ -56,7 +56,7 @@ public:
 	/// Write a Buffer of bytes to the buffer
 	/// </summary>
 	/// <param name="bytes">The Buffer of bytes to write</param>
-	void writeBytes(Buffer bytes);
+	void writeBytes(Buffer& bytes);
 
 	/// <summary>
 	/// Set up the buffer so that bits can be written.

@@ -41,7 +41,7 @@ void PacketBuilder::writeBytes(unsigned char bytes[], int bytesLen)
 	payload.writeBytes(bytes, bytesLen);
 }
 
-void PacketBuilder::writeBytes(Buffer bytes)
+void PacketBuilder::writeBytes(Buffer& bytes)
 {
 	writeBytes(bytes.getData().get(), bytes.getReadableBytes());
 }

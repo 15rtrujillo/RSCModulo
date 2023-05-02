@@ -1,4 +1,4 @@
-#include <boost/asio/ip/network_v4.hpp>
+#include <boost/endian/conversion.hpp>
 #include <sstream>
 
 #include "Buffer.h"
@@ -54,13 +54,13 @@ void Buffer::setWritePosition(int newWritePosition)
 template <typename T>
 T readBigEndianValue(unsigned char data[], int& readPosition)
 {
-	T value = 0;
 	size_t dataLen = sizeof(T);
 
-	for (size_t i = 0; i < dataLen; ++i)
-	{
-		value |= static_cast<T>(static_cast<unsigned char>(data[readPosition++])) << ((dataLen - i - 1) * 8);
-	}
+	T value = 0;
+	std::memcpy(&value, data + readPosition, dataLen);
+	boost::endian::big_to_native_inplace(value);
+
+	readPosition += dataLen;
 
 	return value;
 }
@@ -75,7 +75,7 @@ std::unique_ptr<unsigned char[]> Buffer::readBytes(int length)
 
 char Buffer::readByte()
 {
-	return data[readPosition++];
+	return static_cast<char>(data[readPosition++]);
 }
 
 unsigned char Buffer::readUnsignedByte()
@@ -151,7 +151,7 @@ void Buffer::writeBytes(unsigned char bytes[], int bytesLen)
 	writePosition += bytesLen;
 }
 
-void Buffer::writeBytes(Buffer bytes)
+void Buffer::writeBytes(Buffer& bytes)
 {
 	writeBytes(bytes.getData().get(), bytes.getReadableBytes());
 }
@@ -174,12 +174,12 @@ void Buffer::writeBits(int value, int numBits)
 template <typename T>
 void writeBigEndianValue(T value, unsigned char data[], int& writePosition)
 {
-	size_t dataLen = sizeof(value);
+	size_t dataLen = sizeof(T);
 
-	for (int i = dataLen - 1; i >= 0; --i)
-	{
-		data[writePosition++] = static_cast<unsigned char>(value >> (i * 8));
-	}
+	boost::endian::native_to_big_inplace(value);
+	std::memcpy(data + writePosition, &value, dataLen);
+
+	writePosition += dataLen;
 }
 
 void Buffer::writeByte(char byte)
@@ -208,12 +208,15 @@ void Buffer::writeUnsignedShort(unsigned short us)
 
 void Buffer::write3ByteInt(int i3)
 {
-	size_t dataLen = 3;
+	checkAndResize(sizeof(int) - 1);
+	size_t dataLen = sizeof(int) - 1;
 
-	for (int i = dataLen - 1; i >= 0; --i)
-	{
-		data[writePosition++] = static_cast<unsigned char>(i3 >> (i * 8));
-	}
+	boost::endian::native_to_big_inplace(i3);
+
+	// We need to add one here so that we can get rid of the MSB
+	std::memcpy(data.get() + writePosition, &i3 + 1, dataLen);
+
+	writePosition += dataLen;
 }
 
 void Buffer::writeInt(int i)

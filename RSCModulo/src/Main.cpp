@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < 6; ++i)
 	{
 		xteaBlock.writeInt(noncesAgain[i]);
-		std::cout << "nonce " << (i + 6) << " " << nonces[i] << std::endl;
+		std::cout << "nonce " << (i + 6) << " " << noncesAgain[i] << std::endl;
 	}
 
 	// Write the username
