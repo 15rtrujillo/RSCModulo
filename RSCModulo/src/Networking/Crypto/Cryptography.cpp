@@ -1,13 +1,16 @@
 #include <chrono>
 #include <cstdlib>
 #include <vector>
+#include <boost/endian/conversion.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+
 
 #include "Cryptography.h"
 
-using namespace boost::multiprecision;
+namespace mp = boost::multiprecision;
 
-cpp_int Cryptography::rsaModulus = 0;
-cpp_int Cryptography::rsaExponent = 0;
+mp::cpp_int Cryptography::rsaModulus = 0;
+mp::cpp_int Cryptography::rsaExponent = 0;
 
 ISAAC& Cryptography::getIsaacIn()
 {
@@ -28,41 +31,35 @@ int Cryptography::encodeOpcode(int opcode)
 
 void Cryptography::setRSAModulus(std::string modulus)
 {
-	rsaModulus = cpp_int(modulus);
+	rsaModulus = mp::cpp_int(modulus);
 }
 
 void Cryptography::setRSAExponent(std::string exponent)
 {
-	rsaExponent = cpp_int(exponent);
+	rsaExponent = mp::cpp_int(exponent);
 }
 
-std::unique_ptr<unsigned char[]> Cryptography::rsaEncrypt(unsigned char toEncrypt[], int toEncryptLen, int* encryptedMessageLen)
+std::unique_ptr<unsigned char[]> Cryptography::rsaEncrypt(unsigned char toEncrypt[], int toEncryptLen, int* encryptedDataLen)
 {
-    // Convert to a big int
-    cpp_int dataBigInt = 0;
-    for (int i = 0; i < toEncryptLen; ++i)
-    {
-        dataBigInt <<= 8;
-        dataBigInt += toEncrypt[i];
-    }
+    // Convert the buffer to a big-endian cpp_int
+    mp::cpp_int data;
+    mp::import_bits(data, toEncrypt, toEncrypt + toEncryptLen);
 
-    // Data encrypting...
-    cpp_int encrypted = powm(dataBigInt, rsaExponent, rsaModulus);
+    // Perform moduluar exponentiation
+    mp::cpp_int encrypted = mp::powm(data, rsaExponent, rsaModulus);
 
-    // Convert encrypted BigInteger to a byte buffer
-    std::vector<unsigned char> encryptedBuffer;
-    while (encrypted > 0)
-    {
-        encryptedBuffer.insert(encryptedBuffer.begin(), (unsigned char)(encrypted % 256));
-        encrypted /= 256;
-    }
+    // Export into 8-bit unsigned values, most significant bit first:
+    std::vector<unsigned char> bytes;
 
-    *encryptedMessageLen = static_cast<int>(encryptedBuffer.size());
+    mp::export_bits(encrypted, std::back_inserter(bytes), 8);
 
-    std::unique_ptr<unsigned char[]> encryptedMessage(new unsigned char[*encryptedMessageLen]);
-    std::copy(encryptedBuffer.begin(), encryptedBuffer.end(), encryptedMessage.get());
+    // Put them in the buffer
+    std::unique_ptr<unsigned char[]> encryptedData = std::make_unique<unsigned char[]>(bytes.size());
+    std::memcpy(encryptedData.get(), bytes.data(), bytes.size());
 
-    return std::move(encryptedMessage);
+    // Return stuff
+    *encryptedDataLen = bytes.size();
+    return std::move(encryptedData);
 }
 
 void Cryptography::xteaEncrypt(Buffer& toEncrypt, int key[])
