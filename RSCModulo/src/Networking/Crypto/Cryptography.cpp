@@ -64,9 +64,7 @@ std::unique_ptr<unsigned char[]> Cryptography::rsaEncrypt(unsigned char toEncryp
 
 void Cryptography::xteaEncrypt(Buffer& toEncrypt, int key[])
 {
-    // This doubles as the size of the buffer
     int currentWritePos = toEncrypt.getReadableBytes();
-    //int currentWritePos = 0;
     int currentReadPos = toEncrypt.getReadPosition();
 
     toEncrypt.setReadPosition(0);
@@ -76,12 +74,6 @@ void Cryptography::xteaEncrypt(Buffer& toEncrypt, int key[])
 
     for (int i = 0; i < blocks; ++i)
     {
-        /* This function expects big - endian ints, so we have to read them with magic
-        int v0 = *reinterpret_cast<unsigned int*>(toEncrypt.getData().get() + currentReadPos);
-        currentReadPos += 4;
-        int v1 = *reinterpret_cast<unsigned int*>(toEncrypt.getData().get() + currentReadPos);
-        currentReadPos += 4;
-        */
         int v0 = toEncrypt.readUnsignedInt();
         int v1 = toEncrypt.readUnsignedInt();
         int sum = 0;
@@ -92,14 +84,6 @@ void Cryptography::xteaEncrypt(Buffer& toEncrypt, int key[])
             sum += delta;
         }
 
-        /* We'll write them back the way they are
-        int* writeLocation = reinterpret_cast<int*>(toEncrypt.getData().get() + currentWritePos);
-        *writeLocation = v0;
-        currentWritePos += 4;
-        writeLocation = reinterpret_cast<int*>(toEncrypt.getData().get() + currentWritePos);
-        *writeLocation = v1;
-        currentWritePos += 4;
-        */
         toEncrypt.writeInt(v0);
         toEncrypt.writeInt(v1);
     }

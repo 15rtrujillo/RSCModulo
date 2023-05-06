@@ -88,9 +88,6 @@ int main(int argc, char* argv[])
 	xteaBlock.writeCString(Utils::convertUnicodeString(username));
 
 	// Encrypt the XTEA block. This shouldn't need to be captured as a return value
-	//std::unique_ptr<unsigned char[]> output = std::make_unique<unsigned char[]>(xteaBlock.getReadableBytes());
-	//Cryptography::xteaEncrypt(xteaBlock.getData().get(), xteaBlock.getReadableBytes(), key.get());
-
 	Cryptography::xteaEncrypt(xteaBlock, key.get());
 
 	packet.writeUnsignedShort(xteaBlock.getReadableBytes());
